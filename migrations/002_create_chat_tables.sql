@@ -1,0 +1,17 @@
+CREATE TABLE `conversations` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES users(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `messages` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `conversation_id` INT(11) NOT NULL,
+  `sender` ENUM('user', 'bot') NOT NULL,
+  `message` TEXT NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`conversation_id`) REFERENCES conversations(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
