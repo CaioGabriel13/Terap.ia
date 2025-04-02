@@ -11,24 +11,44 @@ $user_id = $_SESSION['usuario']['id'];
 // Obtém o nome do usuário logado
 $user_name = $_SESSION['usuario']['nome'];
 
-// Verifica se já existe uma conversa para o usuário
-$sql = "SELECT * FROM conversations WHERE user_id = :user_id ORDER BY id DESC LIMIT 1";
-$stmt = $pdo->prepare($sql);
-$stmt->execute([':user_id' => $user_id]);
-$conversation = $stmt->fetch();
+// Verifica se uma conversa específica foi selecionada
+$conversation_id = isset($_GET['conversation_id']) ? (int)$_GET['conversation_id'] : null;
 
-if (!$conversation) {
-    // Cria uma nova conversa para o usuário
-    $sql = "INSERT INTO conversations (user_id) VALUES (:user_id)";
+if ($conversation_id) {
+    // Verifica se a conversa pertence ao usuário
+    $sql = "SELECT * FROM conversations WHERE id = :conversation_id AND user_id = :user_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':conversation_id' => $conversation_id, ':user_id' => $user_id]);
+    $conversation = $stmt->fetch();
+
+    if (!$conversation) {
+        die("Conversa não encontrada.");
+    }
+} else {
+    // Seleciona a conversa mais recente ou cria uma nova
+    $sql = "SELECT * FROM conversations WHERE user_id = :user_id ORDER BY id DESC LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':user_id' => $user_id]);
-    $conversation_id = $pdo->lastInsertId();
-    $conversation = ['id' => $conversation_id];
-} else {
-    $conversation_id = $conversation['id'];
+    $conversation = $stmt->fetch();
+
+    if (!$conversation) {
+        $sql = "INSERT INTO conversations (user_id) VALUES (:user_id)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':user_id' => $user_id]);
+        $conversation_id = $pdo->lastInsertId();
+        $conversation = ['id' => $conversation_id];
+    } else {
+        $conversation_id = $conversation['id'];
+    }
 }
 
-// Recupera as mensagens da conversa
+// Recupera todas as conversas do usuário
+$sql = "SELECT * FROM conversations WHERE user_id = :user_id ORDER BY created_at DESC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([':user_id' => $user_id]);
+$conversations = $stmt->fetchAll();
+
+// Recupera as mensagens da conversa selecionada
 $sql = "SELECT * FROM messages WHERE conversation_id = :conversation_id ORDER BY created_at ASC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([':conversation_id' => $conversation_id]);
@@ -47,8 +67,28 @@ $messages = $stmt->fetchAll();
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mt-3">
       <h2><i class="fas fa-comments"></i> Chatbot</h2>
-      <a href="logout.php" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Deslogar</a>
+      <div>
+        <a href="edit_profile.php" class="btn btn-secondary"><i class="fas fa-user-edit"></i> Editar Perfil</a>
+        <a href="ads_list.php" class="btn btn-info"><i class="fas fa-bullhorn"></i> Anúncios</a>
+        <a href="logout.php" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Deslogar</a>
+      </div>
     </div>
+
+    <!-- Lista de conversas -->
+    <div class="mt-3">
+      <h4>Suas Conversas</h4>
+      <ul class="list-group">
+        <?php foreach ($conversations as $conv): ?>
+          <li class="list-group-item <?php echo $conv['id'] == $conversation_id ? 'active' : ''; ?>">
+            <a href="chat.php?conversation_id=<?php echo $conv['id']; ?>" class="text-decoration-none text-dark">
+              Conversa #<?php echo $conv['id']; ?> - <?php echo $conv['created_at']; ?>
+            </a>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+    </div>
+
+    <!-- Caixa de mensagens -->
     <div class="chat-box mt-3">
       <?php foreach ($messages as $msg): ?>
         <div class="message <?php echo $msg['sender']; ?>">
@@ -62,6 +102,7 @@ $messages = $stmt->fetchAll();
         </div>
       <?php endforeach; ?>
     </div>
+
     <form action="processa_mensagem.php" method="POST" class="mt-3">
       <input type="hidden" name="conversation_id" value="<?php echo $conversation_id; ?>">
       <div class="mb-3">

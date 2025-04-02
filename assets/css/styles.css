@@ -19,6 +19,7 @@ h2 {
     font-weight: bold;
     text-align: center;
     margin-bottom: 20px;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 /* Form Styles */
@@ -39,17 +40,24 @@ form .btn {
     width: 100%;
     padding: 10px;
     font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+form .btn:hover {
+    background-color: #0056b3 !important;
+    transform: scale(1.05);
 }
 
 /* Chat Styles */
 .chat-box {
-    border: 1px solid #dee2e6;
+    border: 2px solid #007bff;
     border-radius: 8px;
     background: #ffffff;
     padding: 15px;
     height: 400px;
     overflow-y: auto;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 .message {
@@ -57,6 +65,8 @@ form .btn {
     padding: 10px;
     border-radius: 8px;
     font-size: 14px;
+    animation: fadeIn 0.5s ease-in-out;
+    transition: transform 0.3s ease;
 }
 
 .message.user {
@@ -64,9 +74,13 @@ form .btn {
     text-align: right;
 }
 
-.message.bot {
+message.bot {
     background-color: #f1f3f5;
     text-align: left;
+}
+
+.message:hover {
+    transform: scale(1.02);
 }
 
 .message small {
@@ -84,4 +98,44 @@ p a {
 
 p a:hover {
     text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Modern Styles */
+.card {
+    animation: fadeIn 0.5s ease-in-out;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.list-group-item {
+    transition: background-color 0.3s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
 }

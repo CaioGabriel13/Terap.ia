@@ -13,9 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $usuario = $stmt->fetch();
 
     if ($usuario && password_verify($senha, $usuario['senha'])) {
-        // Login bem-sucedido: cria sessão
         $_SESSION['usuario'] = $usuario;
-        header('Location: chat.php');
+        if (empty($usuario['type'])) {
+            header('Location: select_type.php');
+            exit;
+        }
+        if ($usuario['type'] === 'paciente') {
+            header('Location: chat.php');
+        } else {
+            header('Location: ads.php');
+        }
         exit;
     } else {
         echo "E-mail ou senha incorretos.";

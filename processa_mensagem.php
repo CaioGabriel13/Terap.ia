@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ':message' => $botMessage
     ]);
 
-    header('Location: chat.php');
+    header("Location: chat.php?conversation_id=$conversation_id");
     exit;
 } else {
     header('Location: chat.php');
