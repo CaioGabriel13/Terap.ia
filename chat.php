@@ -8,6 +8,9 @@ require_once 'includes/config.php';
 
 $user_id = $_SESSION['usuario']['id'];
 
+// Obtém o nome do usuário logado
+$user_name = $_SESSION['usuario']['nome'];
+
 // Verifica se já existe uma conversa para o usuário
 $sql = "SELECT * FROM conversations WHERE user_id = :user_id ORDER BY id DESC LIMIT 1";
 $stmt = $pdo->prepare($sql);
@@ -49,7 +52,12 @@ $messages = $stmt->fetchAll();
     <div class="chat-box mt-3">
       <?php foreach ($messages as $msg): ?>
         <div class="message <?php echo $msg['sender']; ?>">
-          <strong><?php echo ucfirst($msg['sender']); ?>:</strong> <?php echo htmlspecialchars($msg['message']); ?>
+          <strong>
+            <?php 
+              echo $msg['sender'] === 'user' ? htmlspecialchars($user_name) : ucfirst($msg['sender']); 
+            ?>:
+          </strong> 
+          <?php echo htmlspecialchars($msg['message']); ?>
           <small><?php echo $msg['created_at']; ?></small>
         </div>
       <?php endforeach; ?>
