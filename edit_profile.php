@@ -48,11 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="POST">
       <div class="mb-3">
         <label for="nome" class="form-label">Nome:</label>
-        <input type="text" class="form-control" id="nome" name="nome" value="<?php echo htmlspecialchars($user['nome']); ?>" required>
+        <input type="text" class="form-control" id="nome" name="nome" value="<?php echo htmlspecialchars($user['nome']); ?>" readonly>
       </div>
       <div class="mb-3">
         <label for="email" class="form-label">E-mail:</label>
-        <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+        <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
       </div>
       <div class="mb-3">
         <label for="senha" class="form-label">Nova Senha (opcional):</label>

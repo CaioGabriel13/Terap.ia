@@ -58,7 +58,7 @@ $messages = $stmt->fetchAll();
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Chatbot</title>
+  <title>Terap.IA</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="assets/css/styles.css">
@@ -66,7 +66,7 @@ $messages = $stmt->fetchAll();
 <body>
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mt-3">
-      <h2><i class="fas fa-comments"></i> Chatbot</h2>
+      <h2><i class="fas fa-comments"></i> Terap.IA</h2>
       <div>
         <a href="edit_profile.php" class="btn btn-secondary"><i class="fas fa-user-edit"></i> Editar Perfil</a>
         <a href="ads_list.php" class="btn btn-info"><i class="fas fa-bullhorn"></i> Anúncios</a>
