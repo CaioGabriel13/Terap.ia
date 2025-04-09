@@ -7,6 +7,9 @@ $migrationsDir = __DIR__ . '/migrations';
 // Busca todos os arquivos .sql no diretório
 $migrationFiles = glob($migrationsDir . '/*.sql');
 
+// Add the new migration file
+$migrationFiles = glob($migrationsDir . '/*.sql');
+
 // Ordena os arquivos (assumindo que os arquivos estão numerados para indicar a ordem)
 sort($migrationFiles);
 

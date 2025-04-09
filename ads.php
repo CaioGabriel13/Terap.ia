@@ -48,48 +48,51 @@ $ads = $stmt->fetchAll();
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Added Font Awesome -->
 </head>
 <body>
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <h2><i class="fas fa-bullhorn"></i> Meus Anúncios</h2> <!-- Icon added -->
-      <div>
-        <a href="edit_profile.php" class="btn btn-secondary"><i class="fas fa-user-edit"></i> Editar Perfil</a> <!-- Icon added -->
-        <a href="logout.php" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Deslogar</a> <!-- Icon added -->
-      </div>
-    </div>
-    <form method="POST" class="mb-3">
-      <div class="mb-3">
-        <label for="title" class="form-label">Título:</label>
-        <input type="text" class="form-control" id="title" name="title" required>
-      </div>
-      <div class="mb-3">
-        <label for="content" class="form-label">Conteúdo:</label>
-        <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Postar Anúncio</button> <!-- Icon added -->
-    </form>
-    <h3><i class="fas fa-list"></i> Anúncios Postados</h3> <!-- Icon added -->
-    <?php foreach ($ads as $ad): ?>
-      <div class="card mb-3">
-        <div class="card-body">
-          <h5 class="card-title"><?php echo htmlspecialchars($ad['title']); ?></h5>
-          <p class="card-text"><?php echo htmlspecialchars($ad['content']); ?></p>
-          <small class="text-muted">Postado em: <?php echo $ad['created_at']; ?></small>
-          <form method="POST" class="mt-2">
-            <input type="hidden" name="ad_id" value="<?php echo $ad['id']; ?>">
-            <div class="mb-2">
-              <label for="title_<?php echo $ad['id']; ?>" class="form-label">Editar Título:</label>
-              <input type="text" class="form-control" id="title_<?php echo $ad['id']; ?>" name="title" value="<?php echo htmlspecialchars($ad['title']); ?>" required>
-            </div>
-            <div class="mb-2">
-              <label for="content_<?php echo $ad['id']; ?>" class="form-label">Editar Conteúdo:</label>
-              <textarea class="form-control" id="content_<?php echo $ad['id']; ?>" name="content" rows="2" required><?php echo htmlspecialchars($ad['content']); ?></textarea>
-            </div>
-            <button type="submit" name="edit_ad" class="btn btn-warning"><i class="fas fa-edit"></i> Editar</button> <!-- Icon added -->
-            <button type="submit" name="delete_ad" class="btn btn-danger"><i class="fas fa-trash"></i> Remover</button> <!-- Icon added -->
-          </form>
+  <div class="container my-5">
+    <div class="card shadow-lg p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary"><i class="fas fa-bullhorn"></i> Meus Anúncios</h2>
+        <div>
+          <a href="appointments_list.php" class="btn btn-success"><i class="fas fa-calendar-alt"></i> Meus Agendamentos</a> <!-- Added -->
+          <a href="edit_profile.php" class="btn btn-secondary"><i class="fas fa-user-edit"></i> Editar Perfil</a> <!-- Icon added -->
+          <a href="logout.php" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Deslogar</a> <!-- Icon added -->
         </div>
       </div>
-    <?php endforeach; ?>
+      <form method="POST" class="mb-3">
+        <div class="mb-3">
+          <label for="title" class="form-label">Título:</label>
+          <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+          <label for="content" class="form-label">Conteúdo:</label>
+          <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Postar Anúncio</button> <!-- Icon added -->
+      </form>
+      <h3><i class="fas fa-list"></i> Anúncios Postados</h3>
+      <?php foreach ($ads as $ad): ?>
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title"><?php echo htmlspecialchars($ad['title']); ?></h5>
+            <p class="card-text"><?php echo htmlspecialchars($ad['content']); ?></p>
+            <small class="text-muted">Postado em: <?php echo $ad['created_at']; ?></small>
+            <form method="POST" class="mt-2">
+              <input type="hidden" name="ad_id" value="<?php echo $ad['id']; ?>">
+              <div class="mb-2">
+                <label for="title_<?php echo $ad['id']; ?>" class="form-label">Editar Título:</label>
+                <input type="text" class="form-control" id="title_<?php echo $ad['id']; ?>" name="title" value="<?php echo htmlspecialchars($ad['title']); ?>" required>
+              </div>
+              <div class="mb-2">
+                <label for="content_<?php echo $ad['id']; ?>" class="form-label">Editar Conteúdo:</label>
+                <textarea class="form-control" id="content_<?php echo $ad['id']; ?>" name="content" rows="2" required><?php echo htmlspecialchars($ad['content']); ?></textarea>
+              </div>
+              <button type="submit" name="edit_ad" class="btn btn-warning"><i class="fas fa-edit"></i> Editar</button> <!-- Icon added -->
+              <button type="submit" name="delete_ad" class="btn btn-danger"><i class="fas fa-trash"></i> Remover</button> <!-- Icon added -->
+            </form>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
   </div>
 </body>
 </html>

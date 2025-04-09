@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost:3306';
-$db   = 'terap.ia';  // Altere para o nome do seu banco de dados
-$user = 'root';        // Altere para o seu usuário do MySQL
-$pass = '';          // Altere para a sua senha do MySQL
+$db   = 'terap.ia';
+$user = 'root';
+$pass = 'Feijao1*';
 $charset = 'utf8';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
