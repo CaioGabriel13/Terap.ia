@@ -2,7 +2,7 @@
 $host = 'localhost:3306';
 $db   = 'terap.ia';
 $user = 'root';
-$pass = 'Feijao1*';
+$pass = '';
 $charset = 'utf8';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

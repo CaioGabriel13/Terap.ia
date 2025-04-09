@@ -1,0 +1,174 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: "Helvetica Neue", sans-serif;
+    background: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  header.hero {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+  }
+  
+  .hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .btn-primary {
+    background: #fff;
+    color: #2575fc;
+    padding: 12px 24px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 20px;
+    display: inline-block;
+  }
+  
+  section.about {
+    padding: 50px 20px;
+    text-align: center;
+  }
+  
+  .cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 30px;
+  }
+  
+  .card {
+    background: white;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  
+  .cards .card .icon {
+    margin-bottom: 15px;
+  }
+  
+  .cards .card .icon i {
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .consult {
+    background: #e3f2fd;
+    padding: 50px 20px;
+    text-align: center;
+  }
+  
+  .consult form {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .consult input,
+  .consult textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .consult button {
+    background: #2575fc;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .modern-about {
+    background: linear-gradient(to right, #f8f9fa, #e3f2fd);
+    padding: 50px 20px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+.modern-about h2 {
+    font-size: 2.5rem;
+    color: #2575fc;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.modern-about .about-content {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.8;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.modern-about .about-content p {
+    margin-bottom: 15px;
+}
+
+.modern-about p:last-child {
+    margin-bottom: 0;
+}
+
+.example {
+    padding: 50px 20px;
+    text-align: center;
+    background: #f8f9fa;
+    margin-top: 30px;
+}
+
+.example h2 {
+    font-size: 2rem;
+    color: #2575fc;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.example p {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.example-image {
+    max-width: 500px;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-nav {
+    margin: 0px;
+}
+
+.navbar-brand {
+    text-align: center;
+    color:#2575fc;
+    margin: 0 auto;
+}
+
