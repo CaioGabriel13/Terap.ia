@@ -1,26 +1,27 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario'])) {
-    header('Location: login.php');
-    exit;
+  header('Location: login.php');
+  exit;
 }
-require_once 'includes/config.php';
+require_once '../includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $type = $_POST['type'];
-    $user_id = $_SESSION['usuario']['id'];
+  $type = $_POST['type'];
+  $user_id = $_SESSION['usuario']['id'];
 
-    $sql = "UPDATE users SET type = :type WHERE id = :id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([':type' => $type, ':id' => $user_id]);
+  $sql = "UPDATE users SET type = :type WHERE id = :id";
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute([':type' => $type, ':id' => $user_id]);
 
-    $_SESSION['usuario']['type'] = $type;
-    header('Location: chat.php');
-    exit;
+  $_SESSION['usuario']['type'] = $type;
+  header('Location: chat.php');
+  exit;
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <title>Escolher Tipo de Usuário</title>
@@ -30,14 +31,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     body {
       background-color: #f8f9fa;
     }
+
     .card {
       animation: fadeIn 0.5s ease-in-out;
     }
+
     @keyframes fadeIn {
       from {
         opacity: 0;
         transform: translateY(10px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -45,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   </style>
 </head>
+
 <body>
   <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%; animation: fadeIn 0.5s ease-in-out;">
@@ -62,4 +67,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 </body>
+
 </html>

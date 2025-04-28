@@ -1,18 +1,18 @@
 <?php
 session_start();
-require_once 'includes/config.php';
+require_once '../includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email']);
     $senha = trim($_POST['senha']);
 
     if (empty($email)) {
-        header('Location: login.php?email_error=O campo de e-mail é obrigatório.');
+        header('Location: ./pages/login.php?email_error=O campo de e-mail é obrigatório.');
         exit;
     }
 
     if (empty($senha)) {
-        header('Location: login.php?password_error=O campo de senha é obrigatório.');
+        header('Location: ./pages/login.php?password_error=O campo de senha é obrigatório.');
         exit;
     }
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $usuario = $stmt->fetch();
 
     if (!$usuario) {
-        header('Location: login.php?error=Usuário com este e-mail não existe.');
+        header('Location: ./pages/login.php?error=Usuário com este e-mail não existe.');
         exit;
     }
 
@@ -40,11 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         exit;
     } else {
-        header('Location: login.php?error=Credenciais inválidas.');
+        header('Location: ./pages/login.php?error=Credenciais inválidas.');
         exit;
     }
 } else {
-    header('Location: login.php');
+    header('Location: ./pages/login.php');
     exit;
 }
 ?>

@@ -4,7 +4,7 @@ if (!isset($_SESSION['usuario'])) {
     header('Location: login.php');
     exit;
 }
-require_once 'includes/config.php';
+require_once '../includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $conversation_id = $_POST['conversation_id'];

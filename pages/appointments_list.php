@@ -1,23 +1,23 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario'])) {
-    header('Location: login.php');
-    exit;
+  header('Location: ./pages/login.php');
+  exit;
 }
 
-require_once 'includes/config.php';
+require_once '../includes/config.php';
 
 $user = $_SESSION['usuario'];
 
 // Fetch appointments for the logged-in user
 if ($user['type'] === 'paciente') {
-    $sql = "SELECT DISTINCT a.*, u.nome AS psychologist_name, av.price 
+  $sql = "SELECT DISTINCT a.*, u.nome AS psychologist_name, av.price 
             FROM appointments a
             JOIN users u ON a.psychologist_id = u.id
             LEFT JOIN availability av ON av.user_id = a.psychologist_id
             WHERE a.patient_id = :user_id";
 } else {
-    $sql = "SELECT a.*, u.nome AS patient_name 
+  $sql = "SELECT a.*, u.nome AS patient_name 
             FROM appointments a
             JOIN users u ON a.patient_id = u.id
             WHERE a.psychologist_id = :user_id";
@@ -29,12 +29,14 @@ $appointments = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <title>Meus Agendamentos</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
+
 <body>
   <div class="container my-5">
     <div class="card shadow-lg p-4">
@@ -48,9 +50,9 @@ $appointments = $stmt->fetchAll();
         <?php if (count($appointments) > 0): ?>
           <?php foreach ($appointments as $appointment): ?>
             <li class="list-group-item">
-              Data: <?php echo $appointment['appointment_date']; ?>, 
+              Data: <?php echo $appointment['appointment_date']; ?>,
               <?php if ($user['type'] === 'paciente'): ?>
-                Psicólogo: <?php echo htmlspecialchars($appointment['psychologist_name']); ?>, 
+                Psicólogo: <?php echo htmlspecialchars($appointment['psychologist_name']); ?>,
                 Preço: R$ <?php echo number_format($appointment['price'], 2, ',', '.'); ?>
               <?php else: ?>
                 Paciente: <?php echo htmlspecialchars($appointment['patient_name']); ?>
@@ -70,4 +72,5 @@ $appointments = $stmt->fetchAll();
     </div>
   </div>
 </body>
+
 </html>

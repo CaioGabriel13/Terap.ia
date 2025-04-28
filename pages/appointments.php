@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'includes/config.php';
+require_once '../includes/config.php';
 
 if (!isset($_SESSION['usuario'])) {
     header('Content-Type: application/json');
@@ -133,7 +133,7 @@ try {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['psychologist_id'])) {
-        $psychologist_id = (int)$_GET['psychologist_id'];
+        $psychologist_id = (int) $_GET['psychologist_id'];
 
         // Fetch availability for the psychologist
         $sql = "SELECT day_of_week, hour_start, hour_end, price 
@@ -155,9 +155,9 @@ try {
 ?>
 
 <body>
-  <div class="container my-5">
-    <div class="card shadow-lg p-4">
-      <h2 class="text-center text-primary mb-4"><i class="fas fa-calendar-alt"></i> Gerenciar Agendamentos</h2>
+    <div class="container my-5">
+        <div class="card shadow-lg p-4">
+            <h2 class="text-center text-primary mb-4"><i class="fas fa-calendar-alt"></i> Gerenciar Agendamentos</h2>
+        </div>
     </div>
-  </div>
 </body>

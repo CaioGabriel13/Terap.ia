@@ -1,10 +1,10 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['type'] !== 'paciente') {
-    header('Location: login.php');
-    exit;
+  header('Location: ./pages/login.php');
+  exit;
 }
-require_once 'includes/config.php';
+require_once '../includes/config.php';
 
 $filter = $_GET['filter'] ?? '';
 $sql = "SELECT ads.*, users.nome AS psicologo_nome FROM ads 
@@ -13,8 +13,8 @@ $sql = "SELECT ads.*, users.nome AS psicologo_nome FROM ads
 
 $params = [];
 if ($filter) {
-    $sql .= " AND ads.title LIKE :filter";
-    $params[':filter'] = "%$filter%";
+  $sql .= " AND ads.title LIKE :filter";
+  $params[':filter'] = "%$filter%";
 }
 
 $stmt = $pdo->prepare($sql);
@@ -23,13 +23,15 @@ $ads = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
+
 <body>
   <div class="container">
     <!-- Toast Container -->
@@ -41,16 +43,18 @@ $ads = $stmt->fetchAll();
     <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
       <h2 class="mb-3"><i class="fas fa-bullhorn text-primary"></i> Anúncios de Psicólogos</h2>
       <div class="d-flex gap-2">
-        <a href="appointments_list.php" class="btn btn-success"><i class="fas fa-calendar-alt"></i> Meus Agendamentos</a>
+        <a href="appointments_list.php" class="btn btn-success"><i class="fas fa-calendar-alt"></i> Meus
+          Agendamentos</a>
         <a href="edit_profile.php" class="btn btn-secondary"><i class="fas fa-user-edit"></i> Editar Perfil</a>
         <a href="chat.php" class="btn btn-primary"><i class="fas fa-comments"></i> Chat</a>
-        <a href="logout.php" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Deslogar</a>
+        <a href="../logout.php" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Deslogar</a>
       </div>
     </div>
     <form method="GET" class="mb-3">
       <div class="input-group">
         <span class="input-group-text"><i class="fas fa-filter"></i></span>
-        <input type="text" class="form-control" id="filter" name="filter" placeholder="Filtrar por título" value="<?php echo htmlspecialchars($filter); ?>">
+        <input type="text" class="form-control" id="filter" name="filter" placeholder="Filtrar por título"
+          value="<?php echo htmlspecialchars($filter); ?>">
         <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Filtrar</button>
       </div>
     </form>
@@ -61,7 +65,8 @@ $ads = $stmt->fetchAll();
           <div class="card-body">
             <h5 class="card-title"><i class="fas fa-ad"></i> <?php echo htmlspecialchars($ad['title']); ?></h5>
             <p class="card-text"><?php echo htmlspecialchars($ad['content']); ?></p>
-            <small class="text-muted"><i class="fas fa-user"></i> Postado por: <?php echo htmlspecialchars($ad['psicologo_nome']); ?> em <?php echo $ad['created_at']; ?></small>
+            <small class="text-muted"><i class="fas fa-user"></i> Postado por:
+              <?php echo htmlspecialchars($ad['psicologo_nome']); ?> em <?php echo $ad['created_at']; ?></small>
             <button class="btn btn-primary mt-2" onclick="showAvailability(<?php echo $ad['user_id']; ?>)">
               <i class="fas fa-calendar-plus"></i> Ver Disponibilidade
             </button>
@@ -86,7 +91,8 @@ $ads = $stmt->fetchAll();
                   <label for="appointment-date" class="form-label">Selecione uma data:</label>
                   <input type="date" id="appointment-date" class="form-control" min="<?php echo date('Y-m-d'); ?>">
                 </div>
-                <button id="confirm-appointment-btn" class="btn btn-primary" style="display: none;">Confirmar Agendamento</button>
+                <button id="confirm-appointment-btn" class="btn btn-primary" style="display: none;">Confirmar
+                  Agendamento</button>
               </div>
             </div>
             <div class="modal-footer">
@@ -101,37 +107,37 @@ $ads = $stmt->fetchAll();
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-  let selectedPsychologistId = null;
+    let selectedPsychologistId = null;
 
-  function scheduleAppointment(psychologistId, date, time) {
+    function scheduleAppointment(psychologistId, date, time) {
       if (!psychologistId || !date || !time) {
-          showToast('Erro', 'Por favor, selecione uma data e horário.', 'danger');
-          return;
+        showToast('Erro', 'Por favor, selecione uma data e horário.', 'danger');
+        return;
       }
 
       const appointmentDate = `${date} ${time}:00`;
 
       fetch('appointments.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ psychologist_id: psychologistId, appointment_date: appointmentDate })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ psychologist_id: psychologistId, appointment_date: appointmentDate })
       })
-      .then(response => response.json())
-      .then(data => {
+        .then(response => response.json())
+        .then(data => {
           if (data.error) {
-              showToast('Erro', data.error, 'danger');
+            showToast('Erro', data.error, 'danger');
           } else {
-              showToast('Sucesso', data.success, 'success');
-              setTimeout(() => location.reload(), 2000);
+            showToast('Sucesso', data.success, 'success');
+            setTimeout(() => location.reload(), 2000);
           }
-      })
-      .catch(error => {
+        })
+        .catch(error => {
           console.error('Erro ao agendar:', error);
           showToast('Erro', 'Erro ao agendar. Tente novamente mais tarde.', 'danger');
-      });
-  }
+        });
+    }
 
-  function showToast(title, message, type) {
+    function showToast(title, message, type) {
       const toastContainer = document.getElementById('toast-container');
       const toastId = `toast-${Date.now()}`;
       const toast = document.createElement('div');
@@ -154,26 +160,26 @@ $ads = $stmt->fetchAll();
       bootstrapToast.show();
 
       toast.addEventListener('hidden.bs.toast', () => {
-          toast.remove();
+        toast.remove();
       });
-  }
+    }
 
-  function showAvailability(psychologistId) {
+    function showAvailability(psychologistId) {
       selectedPsychologistId = psychologistId;
 
       fetch(`appointments.php?psychologist_id=${psychologistId}`)
-          .then(response => response.json())
-          .then(data => {
-              const list = document.getElementById('availability-list');
-              list.innerHTML = '';
-              if (data.length === 0) {
-                  list.innerHTML = '<li class="list-group-item">Nenhuma disponibilidade encontrada.</li>';
-                  return;
-              }
-              data.forEach(slot => {
-                  const li = document.createElement('li');
-                  li.className = 'list-group-item';
-                  li.innerHTML = `
+        .then(response => response.json())
+        .then(data => {
+          const list = document.getElementById('availability-list');
+          list.innerHTML = '';
+          if (data.length === 0) {
+            list.innerHTML = '<li class="list-group-item">Nenhuma disponibilidade encontrada.</li>';
+            return;
+          }
+          data.forEach(slot => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.innerHTML = `
                       <strong>${capitalize(slot.day_of_week)}</strong>: 
                       ${slot.hour_start} - ${slot.hour_end} 
                       (R$ ${parseFloat(slot.price).toFixed(2)})
@@ -181,18 +187,18 @@ $ads = $stmt->fetchAll();
                           Selecionar Dia
                       </button>
                   `;
-                  list.appendChild(li);
-              });
-              const modal = new bootstrap.Modal(document.getElementById('availability-modal'));
-              modal.show();
-          })
-          .catch(error => {
-              console.error('Erro ao buscar disponibilidade:', error);
-              showToast('Erro', 'Erro ao buscar disponibilidade. Tente novamente mais tarde.', 'danger');
+            list.appendChild(li);
           });
-  }
+          const modal = new bootstrap.Modal(document.getElementById('availability-modal'));
+          modal.show();
+        })
+        .catch(error => {
+          console.error('Erro ao buscar disponibilidade:', error);
+          showToast('Erro', 'Erro ao buscar disponibilidade. Tente novamente mais tarde.', 'danger');
+        });
+    }
 
-  function selectDay(dayOfWeek, hourStart, hourEnd) {
+    function selectDay(dayOfWeek, hourStart, hourEnd) {
       const timeSlotContainer = document.getElementById('time-slot-container');
       const timeSlotSelect = document.getElementById('time-slot-select');
       const dateInputContainer = document.getElementById('date-input-container');
@@ -206,50 +212,51 @@ $ads = $stmt->fetchAll();
       const startTime = new Date(`1970-01-01T${hourStart}`);
       const endTime = new Date(`1970-01-01T${hourEnd}`);
       while (startTime < endTime) {
-          const option = document.createElement('option');
-          option.value = startTime.toTimeString().slice(0, 5);
-          option.textContent = startTime.toTimeString().slice(0, 5);
-          timeSlotSelect.appendChild(option);
-          startTime.setHours(startTime.getHours() + 1);
+        const option = document.createElement('option');
+        option.value = startTime.toTimeString().slice(0, 5);
+        option.textContent = startTime.toTimeString().slice(0, 5);
+        timeSlotSelect.appendChild(option);
+        startTime.setHours(startTime.getHours() + 1);
       }
 
       timeSlotSelect.onchange = () => {
-          if (timeSlotSelect.value) {
-              dateInputContainer.style.display = 'block';
-              confirmButton.style.display = 'block';
-          } else {
-              dateInputContainer.style.display = 'none';
-              confirmButton.style.display = 'none';
-          }
+        if (timeSlotSelect.value) {
+          dateInputContainer.style.display = 'block';
+          confirmButton.style.display = 'block';
+        } else {
+          dateInputContainer.style.display = 'none';
+          confirmButton.style.display = 'none';
+        }
       };
 
       confirmButton.onclick = () => {
-          const selectedTime = timeSlotSelect.value;
-          const selectedDate = document.getElementById('appointment-date').value;
+        const selectedTime = timeSlotSelect.value;
+        const selectedDate = document.getElementById('appointment-date').value;
 
-          if (!selectedTime) {
-              showToast('Erro', 'Por favor, selecione um horário.', 'danger');
-              return;
-          }
+        if (!selectedTime) {
+          showToast('Erro', 'Por favor, selecione um horário.', 'danger');
+          return;
+        }
 
-          if (!selectedDate) {
-              showToast('Erro', 'Por favor, selecione uma data.', 'danger');
-              return;
-          }
+        if (!selectedDate) {
+          showToast('Erro', 'Por favor, selecione uma data.', 'danger');
+          return;
+        }
 
-          const currentDate = new Date().toISOString().split('T')[0];
-          if (selectedDate < currentDate) {
-              showToast('Erro', 'Você não pode agendar uma consulta para uma data passada.', 'danger');
-              return;
-          }
+        const currentDate = new Date().toISOString().split('T')[0];
+        if (selectedDate < currentDate) {
+          showToast('Erro', 'Você não pode agendar uma consulta para uma data passada.', 'danger');
+          return;
+        }
 
-          scheduleAppointment(selectedPsychologistId, selectedDate, selectedTime);
+        scheduleAppointment(selectedPsychologistId, selectedDate, selectedTime);
       };
-  }
+    }
 
-  function capitalize(str) {
+    function capitalize(str) {
       return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+    }
   </script>
 </body>
+
 </html>

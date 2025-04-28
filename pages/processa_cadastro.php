@@ -1,8 +1,8 @@
 <?php
-require_once 'includes/config.php';
+require_once '../includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nome  = trim($_POST['nome']);
+    $nome = trim($_POST['nome']);
     $email = trim($_POST['email']);
     $senha = trim($_POST['senha']);
 
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
         $stmt->execute([
-            ':nome'  => $nome,
+            ':nome' => $nome,
             ':email' => $email,
             ':senha' => $senhaHash
         ]);
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        header('Location: login.php');
+        header('Location: ./pages/login.php');
         exit;
     } catch (Exception $e) {
         header('Location: cadastro.php?error=Erro ao cadastrar. Tente novamente mais tarde.');
