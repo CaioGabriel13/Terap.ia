@@ -27,9 +27,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Criar novo anúncio
     $title = trim($_POST['title']);
     $content = trim($_POST['content']);
-    $sql = "INSERT INTO ads (user_id, title, content) VALUES (:user_id, :title, :content)";
+    $category = trim($_POST['category']);
+    $tags = trim($_POST['tags']);
+    
+    // Processa o upload da imagem se houver
+    $image_url = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+      $upload_dir = '../uploads/ads/';
+      if (!file_exists($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
+      }
+      
+      $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+      $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+      
+      if (in_array($file_extension, $allowed_extensions) && $_FILES['image']['size'] <= 2 * 1024 * 1024) {
+        $image_url = $upload_dir . uniqid() . '.' . $file_extension;
+        move_uploaded_file($_FILES['image']['tmp_name'], $image_url);
+        // Converter para URL relativa para armazenamento
+        $image_url = str_replace('../', '', $image_url);
+      }
+    }
+    
+    $sql = "INSERT INTO ads (user_id, title, content, category, tags, image_url) 
+            VALUES (:user_id, :title, :content, :category, :tags, :image_url)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([':user_id' => $user_id, ':title' => $title, ':content' => $content]);
+    $stmt->execute([
+      ':user_id' => $user_id,
+      ':title' => $title,
+      ':content' => $content,
+      ':category' => $category,
+      ':tags' => $tags,
+      ':image_url' => $image_url
+    ]);
   }
 }
 
@@ -64,14 +94,38 @@ $ads = $stmt->fetchAll();
           <!-- Icon added -->
         </div>
       </div>
-      <form method="POST" class="mb-3">
-        <div class="mb-3">
-          <label for="title" class="form-label">Título:</label>
-          <input type="text" class="form-control" id="title" name="title" required>
+      <form method="POST" class="mb-3" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="title" class="form-label">Título:</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="category" class="form-label">Categoria:</label>
+            <select class="form-select" id="category" name="category" required>
+              <option value="">Selecione uma categoria</option>
+              <option value="Terapia Individual">Terapia Individual</option>
+              <option value="Terapia de Casal">Terapia de Casal</option>
+              <option value="Terapia Familiar">Terapia Familiar</option>
+              <option value="Psicanalise">Psicanálise</option>
+              <option value="Terapia Cognitivo-Comportamental">Terapia Cognitivo-Comportamental</option>
+              <option value="Aconselhamento">Aconselhamento</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">Conteúdo:</label>
           <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="tags" class="form-label">Tags (separadas por vírgula):</label>
+          <input type="text" class="form-control" id="tags" name="tags" placeholder="Ex: ansiedade, depressão, autoestima">
+        </div>
+        <div class="mb-3">
+          <label for="image" class="form-label">Imagem (opcional):</label>
+          <input type="file" class="form-control" id="image" name="image" accept="image/*">
+          <small class="text-muted">Tamanho máximo: 2MB. Formatos aceitos: JPG, PNG, GIF</small>
         </div>
         <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Postar Anúncio</button>
         <!-- Icon added -->
@@ -80,20 +134,59 @@ $ads = $stmt->fetchAll();
       <?php foreach ($ads as $ad): ?>
         <div class="card mb-3">
           <div class="card-body">
-            <h5 class="card-title"><?php echo htmlspecialchars($ad['title']); ?></h5>
+            <?php if ($ad['image_url']): ?>
+              <img src="<?php echo htmlspecialchars('../' . $ad['image_url']); ?>" class="card-img-top mb-3" alt="Imagem do anúncio" style="max-height: 200px; object-fit: cover;">
+            <?php endif; ?>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="card-title"><?php echo htmlspecialchars($ad['title']); ?></h5>
+              <span class="badge bg-primary"><?php echo htmlspecialchars($ad['category']); ?></span>
+            </div>
             <p class="card-text"><?php echo htmlspecialchars($ad['content']); ?></p>
+            <?php if ($ad['tags']): ?>
+              <div class="mb-2">
+                <?php foreach (explode(',', $ad['tags']) as $tag): ?>
+                  <span class="badge bg-secondary me-1"><?php echo htmlspecialchars(trim($tag)); ?></span>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
             <small class="text-muted">Postado em: <?php echo $ad['created_at']; ?></small>
             <form method="POST" class="mt-2">
               <input type="hidden" name="ad_id" value="<?php echo $ad['id']; ?>">
-              <div class="mb-2">
-                <label for="title_<?php echo $ad['id']; ?>" class="form-label">Editar Título:</label>
-                <input type="text" class="form-control" id="title_<?php echo $ad['id']; ?>" name="title"
-                  value="<?php echo htmlspecialchars($ad['title']); ?>" required>
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label for="title_<?php echo $ad['id']; ?>" class="form-label">Editar Título:</label>
+                  <input type="text" class="form-control" id="title_<?php echo $ad['id']; ?>" name="title"
+                    value="<?php echo htmlspecialchars($ad['title']); ?>" required>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label for="category_<?php echo $ad['id']; ?>" class="form-label">Categoria:</label>
+                  <select class="form-select" id="category_<?php echo $ad['id']; ?>" name="category" required>
+                    <option value="">Selecione uma categoria</option>
+                    <?php
+                    $categories = ['Terapia Individual', 'Terapia de Casal', 'Terapia Familiar', 'Psicanalise', 
+                                 'Terapia Cognitivo-Comportamental', 'Aconselhamento', 'Outros'];
+                    foreach ($categories as $cat):
+                      $selected = $cat === $ad['category'] ? 'selected' : '';
+                    ?>
+                      <option value="<?php echo $cat; ?>" <?php echo $selected; ?>><?php echo $cat; ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
               </div>
               <div class="mb-2">
                 <label for="content_<?php echo $ad['id']; ?>" class="form-label">Editar Conteúdo:</label>
                 <textarea class="form-control" id="content_<?php echo $ad['id']; ?>" name="content" rows="2"
                   required><?php echo htmlspecialchars($ad['content']); ?></textarea>
+              </div>
+              <div class="mb-2">
+                <label for="tags_<?php echo $ad['id']; ?>" class="form-label">Tags (separadas por vírgula):</label>
+                <input type="text" class="form-control" id="tags_<?php echo $ad['id']; ?>" name="tags"
+                  value="<?php echo htmlspecialchars($ad['tags']); ?>" placeholder="Ex: ansiedade, depressão, autoestima">
+              </div>
+              <div class="mb-2">
+                <label for="image_<?php echo $ad['id']; ?>" class="form-label">Nova Imagem (opcional):</label>
+                <input type="file" class="form-control" id="image_<?php echo $ad['id']; ?>" name="image" accept="image/*">
+                <small class="text-muted">Tamanho máximo: 2MB. Formatos aceitos: JPG, PNG, GIF</small>
               </div>
               <button type="submit" name="edit_ad" class="btn btn-warning"><i class="fas fa-edit"></i> Editar</button>
               <!-- Icon added -->
