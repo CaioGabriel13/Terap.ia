@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        header('Location: ./pages/login.php');
+        header('Location: login.php');
         exit;
     } catch (Exception $e) {
         header('Location: cadastro.php?error=Erro ao cadastrar. Tente novamente mais tarde.');
