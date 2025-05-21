@@ -7,6 +7,8 @@ if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['type'] !== 'paciente')
 require_once '../includes/config.php';
 
 $filter = $_GET['filter'] ?? '';
+$category = $_GET['category'] ?? '';
+$tags = $_GET['tags'] ?? '';
 $sql = "SELECT ads.*, users.nome AS psicologo_nome,
         CASE 
             WHEN (views + (COUNT(DISTINCT al.id) * 5)) > 100 THEN 'Alta'
@@ -19,15 +21,24 @@ $sql = "SELECT ads.*, users.nome AS psicologo_nome,
         FROM ads 
         JOIN users ON ads.user_id = users.id 
         LEFT JOIN ad_likes al ON ads.id = al.ad_id
-        WHERE users.type = 'psicologo'
-        GROUP BY ads.id, ads.title, ads.content, ads.created_at, ads.user_id, ads.views, users.nome
-        ORDER BY likes_count DESC";
+        WHERE users.type = 'psicologo'";
 
 $params = [];
 if ($filter) {
   $sql .= " AND ads.title LIKE :filter";
   $params[':filter'] = "%$filter%";
 }
+if ($category) {
+  $sql .= " AND ads.category = :category";
+  $params[':category'] = $category;
+}
+if ($tags) {
+  $sql .= " AND ads.tags LIKE :tags";
+  $params[':tags'] = "%$tags%";
+}
+
+$sql .= " GROUP BY ads.id, ads.title, ads.content, ads.created_at, ads.user_id, ads.views, users.nome
+        ORDER BY likes_count DESC, views DESC";
 
 $stmt = $pdo->prepare($sql);
 $params[':current_user'] = $_SESSION['usuario']['id'];
@@ -64,10 +75,14 @@ $ads = $stmt->fetchAll();
       </div>
     </div>
     <form method="GET" class="mb-3">
-      <div class="input-group">
+      <div class="input-group mb-2">
         <span class="input-group-text"><i class="fas fa-filter"></i></span>
         <input type="text" class="form-control" id="filter" name="filter" placeholder="Filtrar por título"
           value="<?php echo htmlspecialchars($filter); ?>">
+        <input type="text" class="form-control" id="category" name="category" placeholder="Filtrar por categoria"
+          value="<?php echo htmlspecialchars($category); ?>">
+        <input type="text" class="form-control" id="tags" name="tags" placeholder="Filtrar por tags"
+          value="<?php echo htmlspecialchars($tags); ?>">
         <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Filtrar</button>
       </div>
     </form>
@@ -79,13 +94,13 @@ $ads = $stmt->fetchAll();
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h5 class="card-title"><i class="fas fa-ad"></i> <?php echo htmlspecialchars($ad['title']); ?></h5>
               <div class="d-flex align-items-center">
-                <button class="btn btn-sm me-2 <?php echo $ad['user_liked'] ? 'btn-danger' : 'btn-outline-danger'; ?>" 
-                        onclick="toggleLike(<?php echo $ad['id']; ?>, this)" 
-                        data-likes="<?php echo $ad['likes_count']; ?>">
-                  <i class="fas fa-heart"></i> 
+                <button class="btn btn-sm me-2 <?php echo $ad['user_liked'] ? 'btn-danger' : 'btn-outline-danger'; ?>"
+                  onclick="toggleLike(<?php echo $ad['id']; ?>, this)" data-likes="<?php echo $ad['likes_count']; ?>">
+                  <i class="fas fa-heart"></i>
                   <span class="likes-count"><?php echo number_format($ad['likes_count']); ?></span>
                 </button>
-                <span class="badge <?php echo $ad['popularidade'] === 'Alta' ? 'bg-success' : ($ad['popularidade'] === 'Média' ? 'bg-warning' : 'bg-secondary'); ?> me-2">
+                <span
+                  class="badge <?php echo $ad['popularidade'] === 'Alta' ? 'bg-success' : ($ad['popularidade'] === 'Média' ? 'bg-warning' : 'bg-secondary'); ?> me-2">
                   <i class="fas fa-chart-line"></i> <?php echo $ad['popularidade']; ?>
                 </span>
                 <span class="badge bg-info">
@@ -93,10 +108,13 @@ $ads = $stmt->fetchAll();
                 </span>
               </div>
             </div>
+            <p class="mb-1"><strong>Categoria:</strong> <?php echo htmlspecialchars($ad['category']); ?></p>
+            <p class="mb-1"><strong>Tags:</strong> <?php echo htmlspecialchars($ad['tags']); ?></p>
             <p class="card-text"><?php echo htmlspecialchars($ad['content']); ?></p>
             <small class="text-muted"><i class="fas fa-user"></i> Postado por:
               <?php echo htmlspecialchars($ad['psicologo_nome']); ?> em <?php echo $ad['created_at']; ?></small>
-            <button class="btn btn-primary mt-2" onclick="showAvailability(<?php echo $ad['user_id']; ?>, <?php echo $ad['id']; ?>)">
+            <button class="btn btn-primary mt-2"
+              onclick="showAvailability(<?php echo $ad['user_id']; ?>, <?php echo $ad['id']; ?>)">
               <i class="fas fa-calendar-plus"></i> Ver Disponibilidade
             </button>
           </div>
@@ -302,29 +320,29 @@ $ads = $stmt->fetchAll();
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ad_id: adId })
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const likesCount = button.querySelector('.likes-count');
-          likesCount.textContent = data.likes;
-          
-          if (data.action === 'liked') {
-            button.classList.remove('btn-outline-danger');
-            button.classList.add('btn-danger');
-            showToast('Sucesso', 'Você curtiu este anúncio!', 'success');
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const likesCount = button.querySelector('.likes-count');
+            likesCount.textContent = data.likes;
+
+            if (data.action === 'liked') {
+              button.classList.remove('btn-outline-danger');
+              button.classList.add('btn-danger');
+              showToast('Sucesso', 'Você curtiu este anúncio!', 'success');
+            } else {
+              button.classList.remove('btn-danger');
+              button.classList.add('btn-outline-danger');
+              showToast('Sucesso', 'Você removeu sua curtida!', 'info');
+            }
           } else {
-            button.classList.remove('btn-danger');
-            button.classList.add('btn-outline-danger');
-            showToast('Sucesso', 'Você removeu sua curtida!', 'info');
+            showToast('Erro', 'Erro ao processar sua curtida', 'danger');
           }
-        } else {
+        })
+        .catch(error => {
+          console.error('Erro ao processar like:', error);
           showToast('Erro', 'Erro ao processar sua curtida', 'danger');
-        }
-      })
-      .catch(error => {
-        console.error('Erro ao processar like:', error);
-        showToast('Erro', 'Erro ao processar sua curtida', 'danger');
-      });
+        });
     }
   </script>
 </body>
