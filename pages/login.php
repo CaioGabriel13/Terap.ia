@@ -10,14 +10,14 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm">
+  <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm mb-0">
     <div class="container-fluid">
-      <a class="navbar-brand text-primary" href="../index.html">Terap.IA</a>
+      <a class="navbar-brand text-primary fw-bold" href="../index.html">Terap.IA</a>
     </div>
   </nav>
-  <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
-      <h2 class="text-center text-primary mb-4"><i class="fas fa-sign-in-alt"></i> Login</h2>
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card p-4 w-100" style="max-width: 420px;">
+      <h2 class="text-center mb-4"><i class="fas fa-sign-in-alt"></i> Login</h2>
       <?php if (isset($_GET['error'])): ?>
         <div class="alert alert-danger" role="alert">
           <?php echo htmlspecialchars($_GET['error']); ?>
@@ -45,9 +45,6 @@
       </p>
     </div>
   </div>
-  <footer class="bg-light text-center py-3 mt-auto">
-    <p class="mb-0">&copy; 2025 Terap.IA - Todos os direitos reservados.</p>
-  </footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

@@ -7,11 +7,24 @@ if (!isset($_SESSION['usuario'])) {
 require_once '../includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $conversation_id = $_POST['conversation_id'];
+    $conversation_id = isset($_POST['conversation_id']) ? (int) $_POST['conversation_id'] : null;
     $message = trim($_POST['message']);
-    $sender = 'user'; // Mensagem enviada pelo usuário
+    $sender = 'user';
 
-    // Insere a mensagem do usuário
+    // Validate conversation ownership
+    $sql = "SELECT * FROM conversations WHERE id = :conversation_id AND user_id = :user_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':conversation_id' => $conversation_id,
+        ':user_id' => $_SESSION['usuario']['id']
+    ]);
+    $conversation = $stmt->fetch();
+    if (!$conversation) {
+        header('Location: chat.php?error=Conversa inválida.');
+        exit;
+    }
+
+    // Insert user message
     $sql = "INSERT INTO messages (conversation_id, sender, message) VALUES (:conversation_id, :sender, :message)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
@@ -20,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ':message' => $message
     ]);
 
-    // Para fins de demonstração, insere uma resposta simples do bot
+    // Simple bot reply
     $botMessage = "Esta é uma resposta do bot.";
     $sql = "INSERT INTO messages (conversation_id, sender, message) VALUES (:conversation_id, :sender, :message)";
     $stmt = $pdo->prepare($sql);
