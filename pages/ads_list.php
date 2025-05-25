@@ -11,13 +11,20 @@ $category = $_GET['category'] ?? '';
 $tags = $_GET['tags'] ?? '';
 $sql = "SELECT ads.*, users.nome AS psicologo_nome,
         CASE 
-            WHEN (views + (COUNT(DISTINCT al.id) * 5)) > 100 THEN 'Alta'
-            WHEN (views + (COUNT(DISTINCT al.id) * 5)) > 50 THEN 'Média'
+            WHEN ((views * 1) + (COUNT(DISTINCT al.id) * 10)) > 10 THEN 'Alta'
+            WHEN ((views * 1) + (COUNT(DISTINCT al.id) * 10)) > 5 THEN 'Média'
             ELSE 'Baixa'
         END as popularidade,
+        CASE
+            WHEN COUNT(DISTINCT al.id) >= 15 THEN 'Altamente Recomendado'
+            WHEN COUNT(DISTINCT al.id) >= 8 THEN 'Recomendado'
+            WHEN COUNT(DISTINCT al.id) >= 3 THEN 'Bem Avaliado'
+            ELSE 'Novo'
+        END as recomendacao,
         views,
         COUNT(DISTINCT al.id) as likes_count,
-        MAX(CASE WHEN al.user_id = :current_user THEN 1 ELSE 0 END) as user_liked
+        MAX(CASE WHEN al.user_id = :current_user THEN 1 ELSE 0 END) as user_liked,
+        ((views * 1) + (COUNT(DISTINCT al.id) * 10)) as score
         FROM ads 
         JOIN users ON ads.user_id = users.id 
         LEFT JOIN ad_likes al ON ads.id = al.ad_id
@@ -37,8 +44,8 @@ if ($tags) {
   $params[':tags'] = "%$tags%";
 }
 
-$sql .= " GROUP BY ads.id, ads.title, ads.content, ads.created_at, ads.user_id, ads.views, users.nome
-        ORDER BY likes_count DESC, views DESC";
+$sql .= " GROUP BY ads.id, ads.title, ads.content, ads.category, ads.tags, ads.created_at, ads.user_id, ads.views, users.nome
+        ORDER BY score DESC, created_at DESC";
 
 $stmt = $pdo->prepare($sql);
 $params[':current_user'] = $_SESSION['usuario']['id'];
@@ -55,6 +62,18 @@ $ads = $stmt->fetchAll();
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <title>Anúncios de Psicólogos</title>
+  <style>
+    .metrics { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+    .popularity-badge, .recommendation-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
+    .popularity-badge.alta { background: #4CAF50; color: white; }
+    .popularity-badge.média { background: #FFC107; color: #000; }
+    .popularity-badge.baixa { background: #9E9E9E; color: white; }
+    .recommendation-badge { background: #E1F5FE; color: #0288D1; }
+    .recommendation-badge.altamente-recomendado { background: #E8F5E9; color: #2E7D32; }
+    .stats { display: flex; gap: 15px; align-items: center; }
+    .stats span { display: flex; align-items: center; gap: 5px; color: #666; }
+    .stats .liked { color: #F44336; }
+  </style>
 </head>
 
 <body>
@@ -131,6 +150,42 @@ $ads = $stmt->fetchAll();
                   <button class="btn btn-primary mt-2 mt-md-0"
                     onclick="showAvailability(<?php echo $ad['user_id']; ?>, <?php echo $ad['id']; ?>)"><i
                       class="fas fa-calendar-plus me-1"></i>Ver Disponibilidade</button>
+                </div>
+                <!-- Popularity and Recommendation Indicators -->
+                <?php
+                $popularityClass = strtolower($ad['popularidade']);
+                $recommendationClass = str_replace(' ', '-', strtolower($ad['recomendacao']));
+                ?>
+                <div class="mt-3">
+                  <span class="badge rounded-pill text-bg-<?php echo $popularityClass === 'alta' ? 'success' : ($popularityClass === 'média' ? 'warning' : 'secondary'); ?>">
+                    <i class="fas fa-chart-line me-1"></i><?php echo $ad['popularidade']; ?>
+                  </span>
+                  <span class="badge rounded-pill text-bg-<?php echo $recommendationClass === 'altamente-recomendado' ? 'primary' : ($recommendationClass === 'recomendado' ? 'info' : 'light'); ?>">
+                    <i class="fas fa-star me-1"></i><?php echo $ad['recomendacao']; ?>
+                  </span>
+                </div>
+                <!-- Metrics Display -->
+                <div class="metrics">
+                  <div class="stat-item">
+                    <span class="stat-label">Visualizações:</span>
+                    <span class="stat-value"><?php echo number_format($ad['views']); ?></span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Curtidas:</span>
+                    <span class="stat-value liked"><?php echo number_format($ad['likes_count']); ?></span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Popularidade:</span>
+                    <span class="stat-value popularity-badge <?php echo strtolower($ad['popularidade']); ?>">
+                      <?php echo $ad['popularidade']; ?>
+                    </span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Recomendação:</span>
+                    <span class="stat-value recommendation-badge <?php echo str_replace(' ', '-', strtolower($ad['recomendacao'])); ?>">
+                      <?php echo $ad['recomendacao']; ?>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
