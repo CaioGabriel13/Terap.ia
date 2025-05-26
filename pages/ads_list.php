@@ -11,14 +11,14 @@ $category = $_GET['category'] ?? '';
 $tags = $_GET['tags'] ?? '';
 $sql = "SELECT ads.*, users.nome AS psicologo_nome,
         CASE 
-            WHEN ((views * 1) + (COUNT(DISTINCT al.id) * 10)) > 10 THEN 'Alta'
-            WHEN ((views * 1) + (COUNT(DISTINCT al.id) * 10)) > 5 THEN 'Média'
+            WHEN ((views * 1) + (COUNT(DISTINCT al.id) * 10)) > 15 THEN 'Alta'
+            WHEN ((views * 1) + (COUNT(DISTINCT al.id) * 10)) > 10 THEN 'Média'
             ELSE 'Baixa'
         END as popularidade,
         CASE
-            WHEN COUNT(DISTINCT al.id) >= 15 THEN 'Altamente Recomendado'
-            WHEN COUNT(DISTINCT al.id) >= 8 THEN 'Recomendado'
-            WHEN COUNT(DISTINCT al.id) >= 3 THEN 'Bem Avaliado'
+            WHEN COUNT(DISTINCT al.id) >= 6 THEN 'Altamente Recomendado'
+            WHEN COUNT(DISTINCT al.id) >= 5 THEN 'Recomendado'
+            WHEN COUNT(DISTINCT al.id) >= 1 THEN 'Bem Avaliado'
             ELSE 'Novo'
         END as recomendacao,
         views,
