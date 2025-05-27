@@ -63,16 +63,61 @@ $ads = $stmt->fetchAll();
   <link rel="stylesheet" href="../assets/css/styles.css">
   <title>Anúncios de Psicólogos</title>
   <style>
-    .metrics { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
-    .popularity-badge, .recommendation-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
-    .popularity-badge.alta { background: #4CAF50; color: white; }
-    .popularity-badge.média { background: #FFC107; color: #000; }
-    .popularity-badge.baixa { background: #9E9E9E; color: white; }
-    .recommendation-badge { background: #E1F5FE; color: #0288D1; }
-    .recommendation-badge.altamente-recomendado { background: #E8F5E9; color: #2E7D32; }
-    .stats { display: flex; gap: 15px; align-items: center; }
-    .stats span { display: flex; align-items: center; gap: 5px; color: #666; }
-    .stats .liked { color: #F44336; }
+    .metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .popularity-badge,
+    .recommendation-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    .popularity-badge.alta {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .popularity-badge.média {
+      background: #FFC107;
+      color: #000;
+    }
+
+    .popularity-badge.baixa {
+      background: #9E9E9E;
+      color: white;
+    }
+
+    .recommendation-badge {
+      background: #E1F5FE;
+      color: #0288D1;
+    }
+
+    .recommendation-badge.altamente-recomendado {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .stats {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .stats span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #666;
+    }
+
+    .stats .liked {
+      color: #F44336;
+    }
   </style>
 </head>
 
@@ -157,10 +202,12 @@ $ads = $stmt->fetchAll();
                 $recommendationClass = str_replace(' ', '-', strtolower($ad['recomendacao']));
                 ?>
                 <div class="mt-3">
-                  <span class="badge rounded-pill text-bg-<?php echo $popularityClass === 'alta' ? 'success' : ($popularityClass === 'média' ? 'warning' : 'secondary'); ?>">
+                  <span
+                    class="badge rounded-pill text-bg-<?php echo $popularityClass === 'alta' ? 'success' : ($popularityClass === 'média' ? 'warning' : 'secondary'); ?>">
                     <i class="fas fa-chart-line me-1"></i><?php echo $ad['popularidade']; ?>
                   </span>
-                  <span class="badge rounded-pill text-bg-<?php echo $recommendationClass === 'altamente-recomendado' ? 'primary' : ($recommendationClass === 'recomendado' ? 'info' : 'light'); ?>">
+                  <span
+                    class="badge rounded-pill text-bg-<?php echo $recommendationClass === 'altamente-recomendado' ? 'primary' : ($recommendationClass === 'recomendado' ? 'info' : 'light'); ?>">
                     <i class="fas fa-star me-1"></i><?php echo $ad['recomendacao']; ?>
                   </span>
                 </div>
@@ -182,7 +229,8 @@ $ads = $stmt->fetchAll();
                   </div>
                   <div class="stat-item">
                     <span class="stat-label">Recomendação:</span>
-                    <span class="stat-value recommendation-badge <?php echo str_replace(' ', '-', strtolower($ad['recomendacao'])); ?>">
+                    <span
+                      class="stat-value recommendation-badge <?php echo str_replace(' ', '-', strtolower($ad['recomendacao'])); ?>">
                       <?php echo $ad['recomendacao']; ?>
                     </span>
                   </div>
@@ -308,11 +356,21 @@ $ads = $stmt->fetchAll();
             list.innerHTML = '<li class="list-group-item">Nenhuma disponibilidade encontrada.</li>';
             return;
           }
+          // Dias da semana em português
+          const daysOfWeek = {
+            'monday': 'Segunda-feira',
+            'tuesday': 'Terça-feira',
+            'wednesday': 'Quarta-feira',
+            'thursday': 'Quinta-feira',
+            'friday': 'Sexta-feira',
+            'saturday': 'Sábado',
+            'sunday': 'Domingo'
+          };
           data.forEach(slot => {
             const li = document.createElement('li');
             li.className = 'list-group-item';
             li.innerHTML = `
-                      <strong>${capitalize(slot.day_of_week)}</strong>: 
+                      <strong>${daysOfWeek[slot.day_of_week.toLowerCase()] || capitalize(slot.day_of_week)}</strong>: 
                       ${slot.hour_start} - ${slot.hour_end} 
                       (R$ ${parseFloat(slot.price).toFixed(2)})
                       <button class="btn btn-sm btn-primary float-end" onclick="selectDay('${slot.day_of_week}', '${slot.hour_start}', '${slot.hour_end}')">

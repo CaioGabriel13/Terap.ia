@@ -1,14 +1,14 @@
 <?php
 $host = 'localhost:3306';
-$db   = 'terap.ia';
+$db = 'terap.ia';
 $user = 'root';
-$pass = '';
+$pass = 'Feijao1*';
 $charset = 'utf8';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 
 $options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 ];
 
