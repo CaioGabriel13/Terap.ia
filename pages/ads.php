@@ -20,35 +20,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ad_id = $_POST['ad_id'];
     $title = trim($_POST['title']);
     $content = trim($_POST['content']);
-    $sql = "UPDATE ads SET title = :title, content = :content WHERE id = :ad_id AND user_id = :user_id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([':title' => $title, ':content' => $content, ':ad_id' => $ad_id, ':user_id' => $user_id]);
+    $category = trim($_POST['category']);
+    $tags = trim($_POST['tags']);
+    $image_url = null;
+    // Processa o upload da imagem se houver
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+      $upload_dir = '../uploads/ads/';
+      if (!file_exists($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
+      }
+      $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+      $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+      if (in_array($file_extension, $allowed_extensions) && $_FILES['image']['size'] <= 2 * 1024 * 1024) {
+        $image_url = $upload_dir . uniqid() . '.' . $file_extension;
+        move_uploaded_file($_FILES['image']['tmp_name'], $image_url);
+        $image_url = str_replace('../', '', $image_url);
+      }
+    }
+    if ($image_url) {
+      $sql = "UPDATE ads SET title = :title, content = :content, category = :category, tags = :tags, image_url = :image_url WHERE id = :ad_id AND user_id = :user_id";
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute([':title' => $title, ':content' => $content, ':category' => $category, ':tags' => $tags, ':image_url' => $image_url, ':ad_id' => $ad_id, ':user_id' => $user_id]);
+    } else {
+      $sql = "UPDATE ads SET title = :title, content = :content, category = :category, tags = :tags WHERE id = :ad_id AND user_id = :user_id";
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute([':title' => $title, ':content' => $content, ':category' => $category, ':tags' => $tags, ':ad_id' => $ad_id, ':user_id' => $user_id]);
+    }
   } else {
     // Criar novo anúncio
     $title = trim($_POST['title']);
     $content = trim($_POST['content']);
     $category = trim($_POST['category']);
     $tags = trim($_POST['tags']);
-    
-    // Processa o upload da imagem se houver
     $image_url = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
       $upload_dir = '../uploads/ads/';
       if (!file_exists($upload_dir)) {
         mkdir($upload_dir, 0777, true);
       }
-      
       $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
       $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-      
       if (in_array($file_extension, $allowed_extensions) && $_FILES['image']['size'] <= 2 * 1024 * 1024) {
         $image_url = $upload_dir . uniqid() . '.' . $file_extension;
         move_uploaded_file($_FILES['image']['tmp_name'], $image_url);
-        // Converter para URL relativa para armazenamento
         $image_url = str_replace('../', '', $image_url);
       }
     }
-    
     $sql = "INSERT INTO ads (user_id, title, content, category, tags, image_url) 
             VALUES (:user_id, :title, :content, :category, :tags, :image_url)";
     $stmt = $pdo->prepare($sql);
@@ -63,7 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
-$sql = "SELECT * FROM ads WHERE user_id = :user_id ORDER BY created_at DESC";
+// Buscar anúncios com likes e views
+$sql = "SELECT ads.*, 
+  (SELECT COUNT(*) FROM ad_likes WHERE ad_id = ads.id) as likes_count, 
+  views 
+  FROM ads WHERE user_id = :user_id ORDER BY created_at DESC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([':user_id' => $user_id]);
 $ads = $stmt->fetchAll();
@@ -120,22 +141,23 @@ $ads = $stmt->fetchAll();
         </div>
         <div class="mb-3">
           <label for="tags" class="form-label">Tags (separadas por vírgula):</label>
-          <input type="text" class="form-control" id="tags" name="tags" placeholder="Ex: ansiedade, depressão, autoestima">
+          <input type="text" class="form-control" id="tags" name="tags"
+            placeholder="Ex: ansiedade, depressão, autoestima">
         </div>
         <div class="mb-3">
           <label for="image" class="form-label">Imagem (opcional):</label>
           <input type="file" class="form-control" id="image" name="image" accept="image/*">
           <small class="text-muted">Tamanho máximo: 2MB. Formatos aceitos: JPG, PNG, GIF</small>
         </div>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Postar Anúncio</button>
-        <!-- Icon added -->
+        <button type="submit" class="btn btn-primary w-100 mb-2"><i class="fas fa-plus"></i> Postar Anúncio</button>
       </form>
       <h3><i class="fas fa-list"></i> Anúncios Postados</h3>
       <?php foreach ($ads as $ad): ?>
         <div class="card mb-3">
           <div class="card-body">
             <?php if ($ad['image_url']): ?>
-              <img src="<?php echo htmlspecialchars('../' . $ad['image_url']); ?>" class="card-img-top mb-3" alt="Imagem do anúncio" style="max-height: 200px; object-fit: cover;">
+              <img src="<?php echo htmlspecialchars('../' . $ad['image_url']); ?>" class="card-img-top mb-3"
+                alt="Imagem do anúncio" style="max-height: 200px; object-fit: cover;">
             <?php endif; ?>
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h5 class="card-title"><?php echo htmlspecialchars($ad['title']); ?></h5>
@@ -149,8 +171,12 @@ $ads = $stmt->fetchAll();
                 <?php endforeach; ?>
               </div>
             <?php endif; ?>
+            <div class="mb-2">
+              <span class="badge bg-info"><i class="fas fa-eye"></i> <?php echo $ad['views']; ?> Visualizações</span>
+              <span class="badge bg-success"><i class="fas fa-heart"></i> <?php echo $ad['likes_count']; ?> Likes</span>
+            </div>
             <small class="text-muted">Postado em: <?php echo $ad['created_at']; ?></small>
-            <form method="POST" class="mt-2">
+            <form method="POST" class="mt-2" enctype="multipart/form-data">
               <input type="hidden" name="ad_id" value="<?php echo $ad['id']; ?>">
               <div class="row">
                 <div class="col-md-6 mb-2">
@@ -163,11 +189,18 @@ $ads = $stmt->fetchAll();
                   <select class="form-select" id="category_<?php echo $ad['id']; ?>" name="category" required>
                     <option value="">Selecione uma categoria</option>
                     <?php
-                    $categories = ['Terapia Individual', 'Terapia de Casal', 'Terapia Familiar', 'Psicanalise', 
-                                 'Terapia Cognitivo-Comportamental', 'Aconselhamento', 'Outros'];
+                    $categories = [
+                      'Terapia Individual',
+                      'Terapia de Casal',
+                      'Terapia Familiar',
+                      'Psicanalise',
+                      'Terapia Cognitivo-Comportamental',
+                      'Aconselhamento',
+                      'Outros'
+                    ];
                     foreach ($categories as $cat):
                       $selected = $cat === $ad['category'] ? 'selected' : '';
-                    ?>
+                      ?>
                       <option value="<?php echo $cat; ?>" <?php echo $selected; ?>><?php echo $cat; ?></option>
                     <?php endforeach; ?>
                   </select>
@@ -188,10 +221,10 @@ $ads = $stmt->fetchAll();
                 <input type="file" class="form-control" id="image_<?php echo $ad['id']; ?>" name="image" accept="image/*">
                 <small class="text-muted">Tamanho máximo: 2MB. Formatos aceitos: JPG, PNG, GIF</small>
               </div>
-              <button type="submit" name="edit_ad" class="btn btn-warning"><i class="fas fa-edit"></i> Editar</button>
-              <!-- Icon added -->
-              <button type="submit" name="delete_ad" class="btn btn-danger"><i class="fas fa-trash"></i> Remover</button>
-              <!-- Icon added -->
+              <button type="submit" name="edit_ad" class="btn btn-warning mb-2"><i class="fas fa-edit"></i>
+                Editar</button>
+              <button type="submit" name="delete_ad" class="btn btn-danger mb-2"><i class="fas fa-trash"></i>
+                Remover</button>
             </form>
           </div>
         </div>

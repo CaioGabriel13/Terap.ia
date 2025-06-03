@@ -10,14 +10,14 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm">
+  <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm mb-0">
     <div class="container-fluid">
-      <a class="navbar-brand text-primary" href="../index.html">Terap.IA</a>
+      <a class="navbar-brand text-primary fw-bold" href="../index.html">Terap.IA</a>
     </div>
   </nav>
-  <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-lg p-4" style="max-width: 500px; width: 100%;">
-      <h2 class="text-center text-primary mb-4"><i class="fas fa-user-plus"></i> Cadastro de Usuário</h2>
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card p-4 w-100" style="max-width: 420px;">
+      <h2 class="text-center mb-4"><i class="fas fa-user-plus"></i> Cadastro de Usuário</h2>
       <?php if (isset($_GET['error'])): ?>
         <div class="alert alert-danger" role="alert">
           <?= htmlspecialchars($_GET['error']) ?>
@@ -36,32 +36,26 @@
           <label for="senha" class="form-label">Senha:</label>
           <input type="password" class="form-control" id="senha" name="senha" placeholder="Crie uma senha" required>
         </div>
-        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-user-plus"></i> Cadastrar</button>
+        <button type="submit" class="btn btn-primary w-100 mt-2"><i class="fas fa-user-plus"></i> Cadastrar</button>
       </form>
       <p class="mt-3 text-center">
         Já tem uma conta? <a href="login.php">Faça o login</a>
       </p>
     </div>
   </div>
-  <footer class="bg-light text-center py-3 mt-auto">
-    <p class="mb-0">&copy; 2025 Terap.IA - Todos os direitos reservados.</p>
-  </footer>
   <script>
     function validateForm() {
       const nome = document.getElementById('nome').value.trim();
       const email = document.getElementById('email').value.trim();
       const senha = document.getElementById('senha').value.trim();
-
       if (!nome || !email || !senha) {
         alert('Todos os campos são obrigatórios.');
         return false;
       }
-
       if (senha.length < 6) {
         alert('A senha deve ter pelo menos 6 caracteres.');
         return false;
       }
-
       return true;
     }
   </script>

@@ -4,7 +4,7 @@ require_once '../includes/config.php';
 
 if (!isset($_SESSION['usuario'])) {
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized access. Please log in.']);
+    echo json_encode(['error' => 'Acesso não autorizado. Por favor, faça login.']);
     exit;
 }
 
@@ -17,7 +17,7 @@ try {
 
             if (!$appointment_id) {
                 header('Content-Type: application/json');
-                echo json_encode(['error' => 'Missing appointment ID.']);
+                echo json_encode(['error' => 'ID do agendamento ausente.']);
                 exit;
             }
 
@@ -30,7 +30,7 @@ try {
 
             if (!$appointment) {
                 header('Content-Type: application/json');
-                echo json_encode(['error' => 'Unauthorized or appointment not found.']);
+                echo json_encode(['error' => 'Não autorizado ou agendamento não encontrado.']);
                 exit;
             }
 
@@ -45,7 +45,7 @@ try {
 
         if ($user['type'] !== 'paciente') {
             header('Content-Type: application/json');
-            echo json_encode(['error' => 'Only patients can schedule appointments.']);
+            echo json_encode(['error' => 'Apenas pacientes podem agendar consultas.']);
             exit;
         }
 
@@ -55,7 +55,7 @@ try {
 
         if (!$psychologist_id || !$appointment_date) {
             header('Content-Type: application/json');
-            echo json_encode(['error' => 'Missing required parameters.']);
+            echo json_encode(['error' => 'Parâmetros obrigatórios ausentes.']);
             exit;
         }
 
@@ -65,7 +65,7 @@ try {
         // Validate the format of the appointment date
         if (!DateTime::createFromFormat('Y-m-d H:i:s', $appointment_date)) {
             header('Content-Type: application/json');
-            echo json_encode(['error' => 'Invalid date format. Please use YYYY-MM-DD HH:MM:SS.']);
+            echo json_encode(['error' => 'Formato de data inválido. Use YYYY-MM-DD HH:MM:SS.']);
             exit;
         }
 
@@ -73,7 +73,7 @@ try {
         $current_time = date('Y-m-d H:i:s');
         if ($appointment_date < $current_time) {
             header('Content-Type: application/json');
-            echo json_encode(['error' => 'You cannot schedule an appointment in the past.']);
+            echo json_encode(['error' => 'Você não pode agendar uma consulta no passado.']);
             exit;
         }
 
@@ -94,7 +94,7 @@ try {
 
         if (!$availability) {
             header('Content-Type: application/json');
-            echo json_encode(['error' => 'The psychologist is not available at this time.']);
+            echo json_encode(['error' => 'O psicólogo não está disponível neste horário.']);
             exit;
         }
 
@@ -113,7 +113,7 @@ try {
 
         if ($existingAppointment) {
             header('Content-Type: application/json');
-            echo json_encode(['error' => 'This time slot is already booked.']);
+            echo json_encode(['error' => 'Este horário já está reservado.']);
             exit;
         }
 
@@ -128,7 +128,7 @@ try {
         ]);
 
         header('Content-Type: application/json');
-        echo json_encode(['success' => 'Appointment scheduled successfully.']);
+        echo json_encode(['success' => 'Consulta agendada com sucesso.']);
         exit;
     }
 
@@ -149,7 +149,7 @@ try {
     }
 } catch (Exception $e) {
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'An unexpected error occurred: ' . $e->getMessage()]);
+    echo json_encode(['error' => 'Ocorreu um erro inesperado: ' . $e->getMessage()]);
     exit;
 }
 ?>
